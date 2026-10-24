@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prosper Railroad Cams</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #0b0f19;
+            --bg-card: #151c2c;
+            --bg-toolbar: rgba(15, 23, 42, 0.92);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-color: #3b82f6;
+            --accent-active-bg: rgba(59, 130, 246, 0.2);
+            --accent-active-border: #3b82f6;
+            --accent-hover: #2563eb;
+            --live-green: #22c55e;
+            --stream-gap: 14px;
+            --stream-padding: 14px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            height: 100dvh;
+        }
+
+        /* Top Header & Navigation Bar */
+        .header-bar {
+            flex-shrink: 0;
+            z-index: 100;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            background: var(--bg-toolbar);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.6rem 1.25rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+        }
+
+        .title-group {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+        }
+
+        .title-group h1 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+        }
+
+        .live-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            background: rgba(34, 197, 94, 0.15);
+            color: #4ade80;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            padding: 0.15rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .live-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: var(--live-green);
+            box-shadow: 0 0 8px var(--live-green);
+            animation: pulse 2s infinite ease-in-out;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.35; transform: scale(0.8); }
+        }
+
+        .controls-group {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.45rem;
+        }
+
+        .controls-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            margin-right: 0.2rem;
+        }
+
+        .toggle-btn, .layout-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            padding: 0.35rem 0.7rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .toggle-btn:hover, .layout-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+        }
+
+        .toggle-btn.active, .layout-btn.active {
+            background: var(--accent-active-bg);
+            color: #93c5fd;
+            border-color: var(--accent-active-border);
+            box-shadow: 0 0 12px rgba(59, 130, 246, 0.2);
+        }
+
+        .toggle-btn .icon {
+            width: 14px;
+            height: 14px;
+            flex-shrink: 0;
+        }
+
+        .toggle-btn.active .icon-off,
+        .toggle-btn:not(.active) .icon-on {
+            display: none;
+        }
+
+        .divider {
+            width: 1px;
+            height: 18px;
+            background-color: var(--border-color);
+            margin: 0 0.25rem;
+        }
+
+        .action-btn {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid transparent;
+            padding: 0.35rem 0.55rem;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.07);
+            color: var(--text-primary);
+        }
+
+        /* Stream Container & Cards */
+        .container {
+            flex: 1;
+            min-height: 0;
+            min-width: 0;
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            align-content: center;
+            gap: var(--stream-gap);
+            padding: var(--stream-padding);
+            overflow-y: auto;
+            overflow-x: hidden;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        /* When scrolling is required due to minimum stream limits, align to top */
+        .container.is-scrollable {
+            align-items: flex-start;
+            align-content: flex-start;
+        }
+
+        /* Clean scrollbar styling */
+        .container::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .container::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        .container::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+        .container::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.35);
+        }
+        .container {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.2) rgba(15, 23, 42, 0.6);
+        }
+
+        .holder {
+            aspect-ratio: 16 / 9;
+            position: relative;
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+            border: 1px solid var(--border-color);
+            flex-shrink: 0;
+            transition: opacity 0.25s ease, transform 0.25s ease, width 0.15s ease, height 0.15s ease;
+            max-width: 100%;
+            min-width: min(100%, 340px);
+        }
+
+        .holder.is-hidden {
+            display: none !important;
+        }
+
+        .card-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0.8rem;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.4) 75%, transparent 100%);
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .card-header .label {
+            color: #f8fafc;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+        }
+
+        .card-header .card-hide-btn {
+            pointer-events: auto;
+            background: rgba(15, 23, 42, 0.65);
+            color: #cbd5e1;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 6px;
+            padding: 0.25rem 0.55rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            backdrop-filter: blur(6px);
+            transition: all 0.2s ease;
+        }
+
+        .card-header .card-hide-btn:hover {
+            background: rgba(239, 68, 68, 0.85);
+            border-color: rgba(239, 68, 68, 0.9);
+            color: #ffffff;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+        }
+
+        .responsive-iframe {
+            aspect-ratio: 16 / 9;
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        /* Empty State */
+        .empty-state {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem 1rem;
+            text-align: center;
+            color: var(--text-secondary);
+            width: 100%;
+            margin: auto;
+        }
+
+        .empty-state.visible {
+            display: flex;
+        }
+
+        .empty-state-icon {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 1rem;
+            opacity: 0.4;
+            color: var(--text-secondary);
+        }
+
+        .empty-state h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            font-size: 0.88rem;
+            margin-bottom: 1.25rem;
+            max-width: 360px;
+        }
+
+        .empty-state-btn {
+            background: var(--accent-color);
+            color: #ffffff;
+            border: none;
+            padding: 0.5rem 1.1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .empty-state-btn:hover {
+            background: var(--accent-hover);
+            box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .header-bar {
+                padding: 0.5rem 0.75rem;
+            }
+            .controls-group {
+                width: 100%;
+                justify-content: flex-start;
+            }
+            .holder {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header with Stream Toggles and Layout Controls -->
+    <header class="header-bar" id="header-bar">
+        <div class="title-group">
+            <h1>Prosper Railroad Cams</h1>
+            <span class="live-badge">
+                <span class="live-dot"></span>
+                Live
+            </span>
+        </div>
+
+        <nav class="controls-group" aria-label="Stream visibility toggles">
+            <span class="controls-label">Cameras:</span>
+            
+            <button type="button" class="toggle-btn active" id="toggle-firstst" data-target="cam-firstst" aria-pressed="true" title="Toggle First Street Camera">
+                <!-- Eye On -->
+                <svg class="icon icon-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                <!-- Eye Off -->
+                <svg class="icon icon-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>
+                <span>First Street</span>
+            </button>
+
+            <button type="button" class="toggle-btn active" id="toggle-prospertrl" data-target="cam-prospertrl" aria-pressed="true" title="Toggle Prosper Trail Camera">
+                <svg class="icon icon-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                <svg class="icon icon-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>
+                <span>Prosper Trail</span>
+            </button>
+
+            <button type="button" class="toggle-btn active" id="toggle-frontierpk" data-target="cam-frontierpk" aria-pressed="true" title="Toggle Frontier Park Camera">
+                <svg class="icon icon-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                <svg class="icon icon-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>
+                <span>Frontier Park</span>
+            </button>
+
+            <div class="divider"></div>
+
+            <button type="button" class="action-btn" id="btn-show-all" title="Show all camera streams">Show All</button>
+            <button type="button" class="action-btn" id="btn-hide-all" title="Hide all camera streams">Hide All</button>
+
+            <div class="divider"></div>
+
+            <span class="controls-label">Layout:</span>
+            <button type="button" class="layout-btn active" id="layout-auto" data-layout="auto" title="Automatically fit to screen">Auto</button>
+            <button type="button" class="layout-btn" id="layout-row" data-layout="row" title="Fit in single horizontal row">Row</button>
+            <button type="button" class="layout-btn" id="layout-grid" data-layout="grid" title="Fit in grid layout">Grid</button>
+        </nav>
+    </header>
+
+    <!-- Main Container for Video Streams -->
+    <main class="container" id="stream-container">
+        <!-- Camera 1: First Street -->
+        <article class="holder" id="cam-firstst" data-cam-id="cam-firstst">
+            <div class="card-header">
+                <span class="label">First Street - West Bound</span>
+                <button type="button" class="card-hide-btn" data-target="cam-firstst" title="Hide First Street stream">
+                    <svg class="icon" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                    <span>Hide</span>
+                </button>
+            </div>
+            <iframe class="responsive-iframe"
+                src="https://g1.ipcamlive.com/player/player.php?alias=firstst&amp;autoplay=1&amp;"
+                allowfullscreen="allowfullscreen"
+                title="First Street - West Bound Railcam">
+            </iframe>
+        </article>
+
+        <!-- Camera 2: Prosper Trail -->
+        <article class="holder" id="cam-prospertrl" data-cam-id="cam-prospertrl">
+            <div class="card-header">
+                <span class="label">Prosper Trail - West Bound</span>
+                <button type="button" class="card-hide-btn" data-target="cam-prospertrl" title="Hide Prosper Trail stream">
+                    <svg class="icon" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                    <span>Hide</span>
+                </button>
+            </div>
+            <iframe class="responsive-iframe"
+                src="https://g1.ipcamlive.com/player/player.php?alias=prospertrl&amp;autoplay=1&amp;"
+                allowfullscreen="allowfullscreen"
+                title="Prosper Trail - West Bound Railcam">
+            </iframe>
+        </article>
+
+        <!-- Camera 3: Frontier Park -->
+        <article class="holder" id="cam-frontierpk" data-cam-id="cam-frontierpk">
+            <div class="card-header">
+                <span class="label">Frontier Park - East Bound</span>
+                <button type="button" class="card-hide-btn" data-target="cam-frontierpk" title="Hide Frontier Park stream">
+                    <svg class="icon" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                    <span>Hide</span>
+                </button>
+            </div>
+            <iframe class="responsive-iframe"
+                src="https://g1.ipcamlive.com/player/player.php?alias=frontierpk&amp;autoplay=1&amp;"
+                allowfullscreen="allowfullscreen"
+                title="Frontier Park - East Bound Railcam">
+            </iframe>
+        </article>
+
+        <!-- Empty State (When all cameras are hidden) -->
+        <section class="empty-state" id="empty-state" aria-live="polite">
+            <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                <line x1="1" y1="1" x2="23" y2="23"></line>
+            </svg>
+            <h2>All camera streams are hidden</h2>
+            <p>Use the camera toggles in the top bar to show any stream, or click below to restore all.</p>
+            <button type="button" class="empty-state-btn" id="empty-show-all-btn">Show All Cameras</button>
+        </section>
+    </main>
+
+    <script>
+        (function () {
+            const STORAGE_KEY = 'prosper_railcam_visibility';
+            const LAYOUT_STORAGE_KEY = 'prosper_railcam_layout_mode';
+            const cameraIds = ['cam-firstst', 'cam-prospertrl', 'cam-frontierpk'];
+            const emptyState = document.getElementById('empty-state');
+            const container = document.getElementById('stream-container');
+
+            // Minimum stream size threshold before engaging scroll bars
+            const MIN_STREAM_WIDTH = 360; 
+            const ASPECT_RATIO = 16 / 9;
+            const GAP = 14;
+            const PADDING = 28; // 14px on each side
+
+            let currentLayoutMode = loadLayoutPreference();
+
+            function loadLayoutPreference() {
+                try {
+                    const saved = localStorage.getItem(LAYOUT_STORAGE_KEY);
+                    if (saved && ['auto', 'row', 'grid'].includes(saved)) {
+                        return saved;
+                    }
+                } catch (e) {
+                    console.warn('localStorage read error:', e);
+                }
+                return 'auto';
+            }
+
+            function saveLayoutPreference(mode) {
+                try {
+                    localStorage.setItem(LAYOUT_STORAGE_KEY, mode);
+                } catch (e) {
+                    console.warn('localStorage write error:', e);
+                }
+            }
+
+            // Load saved preferences or default all to visible
+            function loadPreferences() {
+                try {
+                    const saved = localStorage.getItem(STORAGE_KEY);
+                    if (saved) {
+                        return JSON.parse(saved);
+                    }
+                } catch (e) {
+                    console.warn('localStorage access failed:', e);
+                }
+                return {
+                    'cam-firstst': true,
+                    'cam-prospertrl': true,
+                    'cam-frontierpk': true
+                };
+            }
+
+            // Save preferences
+            function savePreferences(prefs) {
+                try {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
+                } catch (e) {
+                    console.warn('Failed to save to localStorage:', e);
+                }
+            }
+
+            const state = loadPreferences();
+
+            function updateEmptyState() {
+                const anyVisible = cameraIds.some(id => state[id] !== false);
+                if (anyVisible) {
+                    emptyState.classList.remove('visible');
+                } else {
+                    emptyState.classList.add('visible');
+                }
+            }
+
+            // Responsive Screen Fitting Engine
+            let rafId = null;
+            function scheduleLayoutUpdate() {
+                if (rafId) cancelAnimationFrame(rafId);
+                rafId = requestAnimationFrame(updateStreamLayout);
+            }
+
+            function updateStreamLayout() {
+                if (!container) return;
+
+                const visibleHolders = cameraIds
+                    .filter(id => state[id] !== false)
+                    .map(id => document.getElementById(id))
+                    .filter(Boolean);
+
+                const N = visibleHolders.length;
+                if (N === 0) {
+                    container.classList.remove('is-scrollable');
+                    return;
+                }
+
+                // Inner available dimensions (accounting for container padding)
+                const availW = Math.max(0, container.clientWidth - PADDING);
+                const availH = Math.max(0, container.clientHeight - PADDING);
+
+                if (availW <= 0 || availH <= 0) return;
+
+                let bestFit = null;
+                let maxArea = -1;
+
+                // Candidate column counts based on chosen layout mode
+                let candidateCols = [];
+                if (currentLayoutMode === 'row') {
+                    candidateCols = [N]; // All visible streams in 1 horizontal row
+                } else if (currentLayoutMode === 'grid') {
+                    candidateCols = [Math.min(2, N)]; // 2-column grid when N >= 2
+                } else {
+                    // 'auto' mode: test column counts 1..N to find largest stream size that fits
+                    for (let c = 1; c <= N; c++) candidateCols.push(c);
+                }
+
+                for (const cols of candidateCols) {
+                    const rows = Math.ceil(N / cols);
+                    const totalGapX = (cols - 1) * GAP;
+                    const totalGapY = (rows - 1) * GAP;
+
+                    const cellW = (availW - totalGapX) / cols;
+                    const cellH = (availH - totalGapY) / rows;
+
+                    if (cellW <= 0 || cellH <= 0) continue;
+
+                    let w = cellW;
+                    let h = w / ASPECT_RATIO;
+                    if (h > cellH) {
+                        h = cellH;
+                        w = h * ASPECT_RATIO;
+                    }
+
+                    const totalW = w * cols + totalGapX;
+                    const totalH = h * rows + totalGapY;
+                    const fits = (totalW <= availW + 1) && (totalH <= availH + 1);
+
+                    // Check if streams fit on screen AND meet the minimum size limit
+                    if (fits && w >= MIN_STREAM_WIDTH) {
+                        const area = w * h;
+                        if (area > maxArea) {
+                            maxArea = area;
+                            bestFit = { cols, rows, w, h, overflow: false };
+                        }
+                    }
+                }
+
+                // If viewport is too small to fit streams at >= MIN_STREAM_WIDTH:
+                // Engage scroll mode with streams preserved at their minimum size limit
+                if (!bestFit) {
+                    let cols = Math.floor((availW + GAP) / (MIN_STREAM_WIDTH + GAP));
+                    cols = Math.max(1, Math.min(cols, N));
+
+                    if (currentLayoutMode === 'grid' && N >= 2 && availW >= (MIN_STREAM_WIDTH * 2 + GAP)) {
+                        cols = 2;
+                    }
+
+                    let w = (availW - (cols - 1) * GAP) / cols;
+                    if (w < MIN_STREAM_WIDTH) {
+                        // Narrow screen / mobile view: adapt width to viewport
+                        w = Math.max(260, availW);
+                        cols = 1;
+                    } else {
+                        // Keep stream size bounded near the minimum threshold
+                        w = Math.max(MIN_STREAM_WIDTH, Math.min(w, MIN_STREAM_WIDTH * 1.35));
+                    }
+
+                    const h = w / ASPECT_RATIO;
+                    bestFit = { cols, rows: Math.ceil(N / cols), w, h, overflow: true };
+                }
+
+                const targetW = `${Math.floor(bestFit.w)}px`;
+                const targetH = `${Math.floor(bestFit.h)}px`;
+
+                visibleHolders.forEach(holder => {
+                    holder.style.width = targetW;
+                    holder.style.height = targetH;
+                });
+
+                if (bestFit.overflow) {
+                    container.classList.add('is-scrollable');
+                } else {
+                    container.classList.remove('is-scrollable');
+                }
+            }
+
+            function setCameraVisibility(camId, isVisible, shouldSave = true) {
+                state[camId] = isVisible;
+                const camEl = document.getElementById(camId);
+                const toggleBtn = document.querySelector(`.toggle-btn[data-target="${camId}"]`);
+
+                if (camEl) {
+                    if (isVisible) {
+                        camEl.classList.remove('is-hidden');
+                    } else {
+                        camEl.classList.add('is-hidden');
+                    }
+                }
+
+                if (toggleBtn) {
+                    toggleBtn.classList.toggle('active', isVisible);
+                    toggleBtn.setAttribute('aria-pressed', isVisible ? 'true' : 'false');
+                }
+
+                updateEmptyState();
+                scheduleLayoutUpdate();
+
+                if (shouldSave) {
+                    savePreferences(state);
+                }
+            }
+
+            function setLayoutMode(mode) {
+                currentLayoutMode = mode;
+                document.querySelectorAll('.layout-btn').forEach(btn => {
+                    const isActive = btn.getAttribute('data-layout') === mode;
+                    btn.classList.toggle('active', isActive);
+                    btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+                });
+                saveLayoutPreference(mode);
+                scheduleLayoutUpdate();
+            }
+
+            // Bind layout mode buttons
+            document.querySelectorAll('.layout-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    setLayoutMode(btn.getAttribute('data-layout'));
+                });
+            });
+
+            // Bind toolbar toggle buttons
+            document.querySelectorAll('.toggle-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const targetId = btn.getAttribute('data-target');
+                    const currentState = state[targetId] !== false;
+                    setCameraVisibility(targetId, !currentState);
+                });
+            });
+
+            // Bind card "Hide" buttons
+            document.querySelectorAll('.card-hide-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const targetId = btn.getAttribute('data-target');
+                    setCameraVisibility(targetId, false);
+                });
+            });
+
+            // "Show All" actions
+            function showAllCameras() {
+                cameraIds.forEach(id => setCameraVisibility(id, true, false));
+                savePreferences(state);
+            }
+
+            // "Hide All" actions
+            function hideAllCameras() {
+                cameraIds.forEach(id => setCameraVisibility(id, false, false));
+                savePreferences(state);
+            }
+
+            const showAllBtn = document.getElementById('btn-show-all');
+            if (showAllBtn) {
+                showAllBtn.addEventListener('click', showAllCameras);
+            }
+
+            const hideAllBtn = document.getElementById('btn-hide-all');
+            if (hideAllBtn) {
+                hideAllBtn.addEventListener('click', hideAllCameras);
+            }
+
+            const emptyShowAllBtn = document.getElementById('empty-show-all-btn');
+            if (emptyShowAllBtn) {
+                emptyShowAllBtn.addEventListener('click', showAllCameras);
+            }
+
+            // Initialize UI state
+            cameraIds.forEach(id => {
+                const isVisible = state[id] !== false;
+                setCameraVisibility(id, isVisible, false);
+            });
+            setLayoutMode(currentLayoutMode);
+            updateEmptyState();
+
+            // Resize observer for seamless dynamic responsiveness
+            if (window.ResizeObserver && container) {
+                const ro = new ResizeObserver(() => scheduleLayoutUpdate());
+                ro.observe(container);
+            }
+            window.addEventListener('resize', scheduleLayoutUpdate);
+            window.addEventListener('load', scheduleLayoutUpdate);
+            document.addEventListener('DOMContentLoaded', scheduleLayoutUpdate);
+            scheduleLayoutUpdate();
+        })();
+    </script>
+</body>
+
+</html>
