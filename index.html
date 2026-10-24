@@ -5,16 +5,28 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prosper Railroad Cams</title>
+    <title>Prosper Railroad Cams - Live Dashboard</title>
+    
+    <!-- Meta & Open Graph Tags -->
+    <meta name="description" content="Live multi-view dashboard for Prosper Railroad Cameras along the BNSF Fort Worth Subdivision in Prosper, Texas.">
+    <meta name="theme-color" content="#0b0f19">
+    <meta property="og:title" content="Prosper Railroad Cams - Live Dashboard">
+    <meta property="og:description" content="Real-time multi-angle railcam feeds monitoring BNSF train traffic in Prosper, TX.">
+    <meta property="og:type" content="website">
+
+    <!-- Train Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚂</text></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
         :root {
             --bg-main: #0b0f19;
             --bg-card: #151c2c;
-            --bg-toolbar: rgba(15, 23, 42, 0.92);
+            --bg-toolbar: rgba(15, 23, 42, 0.94);
             --border-color: rgba(255, 255, 255, 0.1);
+            --border-color-hover: rgba(255, 255, 255, 0.2);
             --text-primary: #f8fafc;
             --text-secondary: #94a3b8;
             --accent-color: #3b82f6;
@@ -56,7 +68,7 @@
             -webkit-backdrop-filter: blur(16px);
             background: var(--bg-toolbar);
             border-bottom: 1px solid var(--border-color);
-            padding: 0.6rem 1.25rem;
+            padding: 0.6rem 1.15rem;
             display: flex;
             flex-wrap: wrap;
             align-items: center;
@@ -67,14 +79,22 @@
         .title-group {
             display: flex;
             align-items: center;
+            flex-wrap: wrap;
             gap: 0.65rem;
         }
 
         .title-group h1 {
             font-size: 1.1rem;
-            font-weight: 600;
+            font-weight: 700;
             letter-spacing: -0.02em;
             color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+        }
+
+        .title-icon {
+            font-size: 1.15rem;
         }
 
         .live-badge {
@@ -84,7 +104,7 @@
             background: rgba(34, 197, 94, 0.15);
             color: #4ade80;
             border: 1px solid rgba(34, 197, 94, 0.3);
-            padding: 0.15rem 0.5rem;
+            padding: 0.15rem 0.55rem;
             border-radius: 9999px;
             font-size: 0.7rem;
             font-weight: 700;
@@ -106,6 +126,28 @@
             50% { opacity: 0.35; transform: scale(0.8); }
         }
 
+        /* Clock Badge */
+        .clock-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            padding: 0.2rem 0.65rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+            color: var(--text-secondary);
+            user-select: none;
+        }
+
+        .clock-badge .icon {
+            width: 13px;
+            height: 13px;
+            color: var(--text-secondary);
+        }
+
         .controls-group {
             display: flex;
             flex-wrap: wrap;
@@ -114,22 +156,22 @@
         }
 
         .controls-label {
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.06em;
             color: var(--text-secondary);
-            margin-right: 0.2rem;
+            margin-right: 0.15rem;
         }
 
-        .toggle-btn, .layout-btn {
+        .toggle-btn, .layout-btn, .action-btn {
             display: inline-flex;
             align-items: center;
             gap: 0.45rem;
             background: rgba(255, 255, 255, 0.05);
             color: var(--text-secondary);
             border: 1px solid var(--border-color);
-            padding: 0.35rem 0.7rem;
+            padding: 0.35rem 0.68rem;
             border-radius: 8px;
             font-size: 0.8rem;
             font-weight: 500;
@@ -138,19 +180,20 @@
             user-select: none;
         }
 
-        .toggle-btn:hover, .layout-btn:hover {
+        .toggle-btn:hover, .layout-btn:hover, .action-btn:hover {
             background: rgba(255, 255, 255, 0.1);
             color: var(--text-primary);
+            border-color: var(--border-color-hover);
         }
 
-        .toggle-btn.active, .layout-btn.active {
+        .toggle-btn.active, .layout-btn.active, .action-btn.active {
             background: var(--accent-active-bg);
             color: #93c5fd;
             border-color: var(--accent-active-border);
             box-shadow: 0 0 12px rgba(59, 130, 246, 0.2);
         }
 
-        .toggle-btn .icon {
+        .toggle-btn .icon, .action-btn .icon {
             width: 14px;
             height: 14px;
             flex-shrink: 0;
@@ -165,24 +208,7 @@
             width: 1px;
             height: 18px;
             background-color: var(--border-color);
-            margin: 0 0.25rem;
-        }
-
-        .action-btn {
-            background: transparent;
-            color: var(--text-secondary);
-            border: 1px solid transparent;
-            padding: 0.35rem 0.55rem;
-            border-radius: 6px;
-            font-size: 0.78rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .action-btn:hover {
-            background: rgba(255, 255, 255, 0.07);
-            color: var(--text-primary);
+            margin: 0 0.2rem;
         }
 
         /* Stream Container & Cards */
@@ -204,13 +230,12 @@
             box-sizing: border-box;
         }
 
-        /* When scrolling is required due to minimum stream limits, align to top */
         .container.is-scrollable {
             align-items: flex-start;
             align-content: flex-start;
         }
 
-        /* Clean scrollbar styling */
+        /* Scrollbar styling */
         .container::-webkit-scrollbar {
             width: 8px;
             height: 8px;
@@ -236,16 +261,26 @@
             background-color: var(--bg-card);
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
             border: 1px solid var(--border-color);
             flex-shrink: 0;
-            transition: opacity 0.25s ease, transform 0.25s ease, width 0.15s ease, height 0.15s ease;
+            transition: opacity 0.25s ease, transform 0.25s ease, width 0.15s ease, height 0.15s ease, border-color 0.2s ease;
             max-width: 100%;
             min-width: min(100%, 340px);
         }
 
+        .holder:hover {
+            border-color: rgba(255, 255, 255, 0.22);
+        }
+
         .holder.is-hidden {
             display: none !important;
+        }
+
+        .holder.is-maximized {
+            z-index: 50;
+            border-color: var(--accent-active-border);
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.35);
         }
 
         .card-header {
@@ -256,42 +291,92 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0.5rem 0.8rem;
-            background: linear-gradient(180deg, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.4) 75%, transparent 100%);
+            padding: 0.55rem 0.85rem;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.45) 75%, transparent 100%);
             z-index: 10;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .card-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
             pointer-events: none;
         }
 
         .card-header .label {
             color: #f8fafc;
-            font-size: 0.85rem;
+            font-size: 0.86rem;
             font-weight: 600;
             letter-spacing: -0.01em;
             text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
         }
 
-        .card-header .card-hide-btn {
+        .direction-pill {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            background: rgba(59, 130, 246, 0.25);
+            color: #93c5fd;
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .card-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
             pointer-events: auto;
-            background: rgba(15, 23, 42, 0.65);
+        }
+
+        .card-btn {
+            background: rgba(15, 23, 42, 0.7);
             color: #cbd5e1;
             border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 6px;
-            padding: 0.25rem 0.55rem;
-            font-size: 0.75rem;
-            font-weight: 500;
-            cursor: pointer;
+            width: 28px;
+            height: 28px;
             display: inline-flex;
             align-items: center;
-            gap: 0.3rem;
+            justify-content: center;
+            cursor: pointer;
             backdrop-filter: blur(6px);
             transition: all 0.2s ease;
         }
 
-        .card-header .card-hide-btn:hover {
+        .card-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .card-btn.hide-btn:hover {
             background: rgba(239, 68, 68, 0.85);
             border-color: rgba(239, 68, 68, 0.9);
             color: #ffffff;
             box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+        }
+
+        .card-btn.maximize-btn.active {
+            background: var(--accent-active-bg);
+            color: #93c5fd;
+            border-color: var(--accent-active-border);
+        }
+
+        .card-btn .icon {
+            width: 14px;
+            height: 14px;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        .card-btn.reload-btn.is-reloading .icon {
+            animation: spin 0.75s linear infinite;
         }
 
         .responsive-iframe {
@@ -300,6 +385,7 @@
             height: 100%;
             border: none;
             display: block;
+            background-color: #000;
         }
 
         /* Empty State */
@@ -357,13 +443,172 @@
             box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
         }
 
-        @media (max-width: 768px) {
+        /* Maximized Floating Banner Hint */
+        .maximize-banner {
+            position: fixed;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            opacity: 0;
+            pointer-events: none;
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            color: #f8fafc;
+            padding: 0.45rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 120;
+        }
+
+        .maximize-banner.visible {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .maximize-banner button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            padding: 0.2rem 0.55rem;
+            border-radius: 9999px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .maximize-banner button:hover {
+            background: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        /* Shortcuts Help Modal */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            padding: 1rem;
+        }
+
+        .modal-backdrop.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-card {
+            background: #151c2c;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+            overflow: hidden;
+            animation: modalPop 0.25s ease-out;
+        }
+
+        @keyframes modalPop {
+            0% { transform: scale(0.95); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.9rem 1.2rem;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(15, 23, 42, 0.5);
+        }
+
+        .modal-header h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .modal-close-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.4rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            transition: all 0.15s ease;
+        }
+
+        .modal-close-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+        }
+
+        .modal-body {
+            padding: 1.2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .shortcut-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .shortcut-keys {
+            display: flex;
+            gap: 0.25rem;
+            align-items: center;
+        }
+
+        kbd {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-bottom-color: rgba(255, 255, 255, 0.35);
+            box-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
+            border-radius: 5px;
+            padding: 0.2rem 0.5rem;
+            font-family: inherit;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        @media (max-width: 860px) {
             .header-bar {
                 padding: 0.5rem 0.75rem;
             }
             .controls-group {
                 width: 100%;
                 justify-content: flex-start;
+            }
+            .clock-badge {
+                order: 3;
             }
             .holder {
                 min-width: 100%;
@@ -373,34 +618,42 @@
 </head>
 
 <body>
-    <!-- Header with Stream Toggles and Layout Controls -->
+    <!-- Header with Stream Toggles, Live Clock, and Controls -->
     <header class="header-bar" id="header-bar">
         <div class="title-group">
-            <h1>Prosper Railroad Cams</h1>
+            <h1>
+                <span class="title-icon">🚂</span>
+                Prosper Railroad Cams
+            </h1>
             <span class="live-badge">
                 <span class="live-dot"></span>
                 Live
             </span>
+            <div class="clock-badge" id="live-clock" title="Prosper, Texas Local Time (US Central)">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                <span id="clock-time">--:--:-- -- CT</span>
+            </div>
         </div>
 
         <nav class="controls-group" aria-label="Stream visibility toggles">
             <span class="controls-label">Cameras:</span>
             
-            <button type="button" class="toggle-btn active" id="toggle-firstst" data-target="cam-firstst" aria-pressed="true" title="Toggle First Street Camera">
-                <!-- Eye On -->
+            <button type="button" class="toggle-btn active" id="toggle-firstst" data-target="cam-firstst" aria-pressed="true" title="Toggle First Street Camera (Key: 1)">
                 <svg class="icon icon-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                     <circle cx="12" cy="12" r="3"></circle>
                 </svg>
-                <!-- Eye Off -->
                 <svg class="icon icon-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
                     <line x1="1" y1="1" x2="23" y2="23"></line>
                 </svg>
-                <span>First Street</span>
+                <span>First St</span>
             </button>
 
-            <button type="button" class="toggle-btn active" id="toggle-prospertrl" data-target="cam-prospertrl" aria-pressed="true" title="Toggle Prosper Trail Camera">
+            <button type="button" class="toggle-btn active" id="toggle-prospertrl" data-target="cam-prospertrl" aria-pressed="true" title="Toggle Prosper Trail Camera (Key: 2)">
                 <svg class="icon icon-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                     <circle cx="12" cy="12" r="3"></circle>
@@ -409,10 +662,10 @@
                     <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
                     <line x1="1" y1="1" x2="23" y2="23"></line>
                 </svg>
-                <span>Prosper Trail</span>
+                <span>Prosper Trl</span>
             </button>
 
-            <button type="button" class="toggle-btn active" id="toggle-frontierpk" data-target="cam-frontierpk" aria-pressed="true" title="Toggle Frontier Park Camera">
+            <button type="button" class="toggle-btn active" id="toggle-frontierpk" data-target="cam-frontierpk" aria-pressed="true" title="Toggle Frontier Park Camera (Key: 3)">
                 <svg class="icon icon-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                     <circle cx="12" cy="12" r="3"></circle>
@@ -421,20 +674,45 @@
                     <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
                     <line x1="1" y1="1" x2="23" y2="23"></line>
                 </svg>
-                <span>Frontier Park</span>
+                <span>Frontier Pk</span>
             </button>
 
             <div class="divider"></div>
 
             <button type="button" class="action-btn" id="btn-show-all" title="Show all camera streams">Show All</button>
-            <button type="button" class="action-btn" id="btn-hide-all" title="Hide all camera streams">Hide All</button>
+            <button type="button" class="action-btn" id="btn-reload-all" title="Reload all active streams (Key: R)">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M23 4v6h-6"></path>
+                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                </svg>
+                <span>Reload</span>
+            </button>
 
             <div class="divider"></div>
 
             <span class="controls-label">Layout:</span>
             <button type="button" class="layout-btn active" id="layout-auto" data-layout="auto" title="Automatically fit to screen">Auto</button>
             <button type="button" class="layout-btn" id="layout-row" data-layout="row" title="Fit in single horizontal row">Row</button>
-            <button type="button" class="layout-btn" id="layout-grid" data-layout="grid" title="Fit in grid layout">Grid</button>
+            <button type="button" class="layout-btn" id="layout-grid" data-layout="grid" title="Fit in 2-column grid">Grid</button>
+
+            <div class="divider"></div>
+
+            <!-- Fullscreen & Shortcuts Help Buttons -->
+            <button type="button" class="action-btn" id="btn-fullscreen" title="Toggle Fullscreen (Key: F)">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                </svg>
+                <span id="fullscreen-btn-text">Fullscreen</span>
+            </button>
+
+            <button type="button" class="action-btn" id="btn-shortcuts" title="Keyboard Shortcuts (Key: ?)">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                <span>?</span>
+            </button>
         </nav>
     </header>
 
@@ -442,17 +720,36 @@
     <main class="container" id="stream-container">
         <!-- Camera 1: First Street -->
         <article class="holder" id="cam-firstst" data-cam-id="cam-firstst">
-            <div class="card-header">
-                <span class="label">First Street - West Bound</span>
-                <button type="button" class="card-hide-btn" data-target="cam-firstst" title="Hide First Street stream">
-                    <svg class="icon" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                    <span>Hide</span>
-                </button>
+            <div class="card-header" title="Double-click header to maximize/restore">
+                <div class="card-title-wrap">
+                    <span class="label">First Street</span>
+                    <span class="direction-pill" title="West Bound crossing camera">WB</span>
+                </div>
+                <div class="card-actions">
+                    <button type="button" class="card-btn reload-btn" data-target="cam-firstst" title="Reload First Street stream">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M23 4v6h-6"></path>
+                            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                        </svg>
+                    </button>
+                    <button type="button" class="card-btn maximize-btn" data-target="cam-firstst" title="Maximize First Street camera (or double-click card)">
+                        <svg class="icon icon-expand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <polyline points="9 21 3 21 3 15"></polyline>
+                            <line x1="21" y1="3" x2="14" y2="10"></line>
+                            <line x1="3" y1="21" x2="10" y2="14"></line>
+                        </svg>
+                    </button>
+                    <button type="button" class="card-btn hide-btn" data-target="cam-firstst" title="Hide First Street stream">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
             </div>
             <iframe class="responsive-iframe"
+                data-src="https://g1.ipcamlive.com/player/player.php?alias=firstst&amp;autoplay=1&amp;"
                 src="https://g1.ipcamlive.com/player/player.php?alias=firstst&amp;autoplay=1&amp;"
                 allowfullscreen="allowfullscreen"
                 title="First Street - West Bound Railcam">
@@ -461,17 +758,36 @@
 
         <!-- Camera 2: Prosper Trail -->
         <article class="holder" id="cam-prospertrl" data-cam-id="cam-prospertrl">
-            <div class="card-header">
-                <span class="label">Prosper Trail - West Bound</span>
-                <button type="button" class="card-hide-btn" data-target="cam-prospertrl" title="Hide Prosper Trail stream">
-                    <svg class="icon" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                    <span>Hide</span>
-                </button>
+            <div class="card-header" title="Double-click header to maximize/restore">
+                <div class="card-title-wrap">
+                    <span class="label">Prosper Trail</span>
+                    <span class="direction-pill" title="West Bound crossing camera">WB</span>
+                </div>
+                <div class="card-actions">
+                    <button type="button" class="card-btn reload-btn" data-target="cam-prospertrl" title="Reload Prosper Trail stream">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M23 4v6h-6"></path>
+                            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                        </svg>
+                    </button>
+                    <button type="button" class="card-btn maximize-btn" data-target="cam-prospertrl" title="Maximize Prosper Trail camera (or double-click card)">
+                        <svg class="icon icon-expand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <polyline points="9 21 3 21 3 15"></polyline>
+                            <line x1="21" y1="3" x2="14" y2="10"></line>
+                            <line x1="3" y1="21" x2="10" y2="14"></line>
+                        </svg>
+                    </button>
+                    <button type="button" class="card-btn hide-btn" data-target="cam-prospertrl" title="Hide Prosper Trail stream">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
             </div>
             <iframe class="responsive-iframe"
+                data-src="https://g1.ipcamlive.com/player/player.php?alias=prospertrl&amp;autoplay=1&amp;"
                 src="https://g1.ipcamlive.com/player/player.php?alias=prospertrl&amp;autoplay=1&amp;"
                 allowfullscreen="allowfullscreen"
                 title="Prosper Trail - West Bound Railcam">
@@ -480,17 +796,36 @@
 
         <!-- Camera 3: Frontier Park -->
         <article class="holder" id="cam-frontierpk" data-cam-id="cam-frontierpk">
-            <div class="card-header">
-                <span class="label">Frontier Park - East Bound</span>
-                <button type="button" class="card-hide-btn" data-target="cam-frontierpk" title="Hide Frontier Park stream">
-                    <svg class="icon" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                    <span>Hide</span>
-                </button>
+            <div class="card-header" title="Double-click header to maximize/restore">
+                <div class="card-title-wrap">
+                    <span class="label">Frontier Park</span>
+                    <span class="direction-pill" title="East Bound crossing camera">EB</span>
+                </div>
+                <div class="card-actions">
+                    <button type="button" class="card-btn reload-btn" data-target="cam-frontierpk" title="Reload Frontier Park stream">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M23 4v6h-6"></path>
+                            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                        </svg>
+                    </button>
+                    <button type="button" class="card-btn maximize-btn" data-target="cam-frontierpk" title="Maximize Frontier Park camera (or double-click card)">
+                        <svg class="icon icon-expand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <polyline points="9 21 3 21 3 15"></polyline>
+                            <line x1="21" y1="3" x2="14" y2="10"></line>
+                            <line x1="3" y1="21" x2="10" y2="14"></line>
+                        </svg>
+                    </button>
+                    <button type="button" class="card-btn hide-btn" data-target="cam-frontierpk" title="Hide Frontier Park stream">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
             </div>
             <iframe class="responsive-iframe"
+                data-src="https://g1.ipcamlive.com/player/player.php?alias=frontierpk&amp;autoplay=1&amp;"
                 src="https://g1.ipcamlive.com/player/player.php?alias=frontierpk&amp;autoplay=1&amp;"
                 allowfullscreen="allowfullscreen"
                 title="Frontier Park - East Bound Railcam">
@@ -509,6 +844,52 @@
         </section>
     </main>
 
+    <!-- Maximized Mode Floating Pill Indicator -->
+    <div class="maximize-banner" id="maximize-banner">
+        <span>Focused on single camera</span>
+        <button type="button" id="btn-restore-view" title="Restore multi-camera grid (Key: Esc)">Restore Multi-View</button>
+    </div>
+
+    <!-- Shortcuts Help Modal -->
+    <div class="modal-backdrop" id="shortcuts-modal" aria-hidden="true">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Keyboard Shortcuts</h3>
+                <button type="button" class="modal-close-btn" id="modal-close-btn" aria-label="Close modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="shortcut-row">
+                    <span>Toggle Camera 1 (First St)</span>
+                    <div class="shortcut-keys"><kbd>1</kbd></div>
+                </div>
+                <div class="shortcut-row">
+                    <span>Toggle Camera 2 (Prosper Trl)</span>
+                    <div class="shortcut-keys"><kbd>2</kbd></div>
+                </div>
+                <div class="shortcut-row">
+                    <span>Toggle Camera 3 (Frontier Pk)</span>
+                    <div class="shortcut-keys"><kbd>3</kbd></div>
+                </div>
+                <div class="shortcut-row">
+                    <span>Toggle Browser Fullscreen</span>
+                    <div class="shortcut-keys"><kbd>F</kbd></div>
+                </div>
+                <div class="shortcut-row">
+                    <span>Reload All Active Streams</span>
+                    <div class="shortcut-keys"><kbd>R</kbd></div>
+                </div>
+                <div class="shortcut-row">
+                    <span>Restore Multi-View / Close Modal</span>
+                    <div class="shortcut-keys"><kbd>Esc</kbd></div>
+                </div>
+                <div class="shortcut-row">
+                    <span>Show / Hide Shortcuts</span>
+                    <div class="shortcut-keys"><kbd>?</kbd></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         (function () {
             const STORAGE_KEY = 'prosper_railcam_visibility';
@@ -516,14 +897,39 @@
             const cameraIds = ['cam-firstst', 'cam-prospertrl', 'cam-frontierpk'];
             const emptyState = document.getElementById('empty-state');
             const container = document.getElementById('stream-container');
+            const maximizeBanner = document.getElementById('maximize-banner');
+            const shortcutsModal = document.getElementById('shortcuts-modal');
 
-            // Minimum stream size threshold before engaging scroll bars
+            // Sizing engine constants
             const MIN_STREAM_WIDTH = 360; 
             const ASPECT_RATIO = 16 / 9;
             const GAP = 14;
-            const PADDING = 28; // 14px on each side
+            const PADDING = 28;
 
             let currentLayoutMode = loadLayoutPreference();
+            let maximizedCamId = null;
+
+            // Live US Central Time Clock
+            function updateClock() {
+                const clockEl = document.getElementById('clock-time');
+                if (!clockEl) return;
+                try {
+                    const now = new Date();
+                    const formatted = new Intl.DateTimeFormat('en-US', {
+                        timeZone: 'America/Chicago',
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: true
+                    }).format(now);
+                    clockEl.textContent = `${formatted} CT`;
+                } catch (e) {
+                    const fallback = new Date().toLocaleTimeString();
+                    clockEl.textContent = `${fallback} CT`;
+                }
+            }
+            setInterval(updateClock, 1000);
+            updateClock();
 
             function loadLayoutPreference() {
                 try {
@@ -545,7 +951,6 @@
                 }
             }
 
-            // Load saved preferences or default all to visible
             function loadPreferences() {
                 try {
                     const saved = localStorage.getItem(STORAGE_KEY);
@@ -562,7 +967,6 @@
                 };
             }
 
-            // Save preferences
             function savePreferences(prefs) {
                 try {
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
@@ -603,23 +1007,53 @@
                     return;
                 }
 
-                // Inner available dimensions (accounting for container padding)
                 const availW = Math.max(0, container.clientWidth - PADDING);
                 const availH = Math.max(0, container.clientHeight - PADDING);
-
                 if (availW <= 0 || availH <= 0) return;
+
+                // Handle single maximized camera focus mode
+                if (maximizedCamId) {
+                    const maxHolder = document.getElementById(maximizedCamId);
+                    if (maxHolder && state[maximizedCamId] !== false) {
+                        visibleHolders.forEach(holder => {
+                            if (holder.id !== maximizedCamId) {
+                                holder.style.display = 'none';
+                            }
+                        });
+                        maxHolder.style.display = 'block';
+
+                        let w = availW;
+                        let h = w / ASPECT_RATIO;
+                        if (h > availH) {
+                            h = availH;
+                            w = h * ASPECT_RATIO;
+                        }
+
+                        maxHolder.style.width = `${Math.floor(w)}px`;
+                        maxHolder.style.height = `${Math.floor(h)}px`;
+                        container.classList.remove('is-scrollable');
+                        return;
+                    } else {
+                        // Reset if maximized cam was hidden
+                        maximizedCamId = null;
+                        if (maximizeBanner) maximizeBanner.classList.remove('visible');
+                    }
+                }
+
+                // Normal multi-camera mode: reset display styling
+                visibleHolders.forEach(holder => {
+                    holder.style.display = 'block';
+                });
 
                 let bestFit = null;
                 let maxArea = -1;
 
-                // Candidate column counts based on chosen layout mode
                 let candidateCols = [];
                 if (currentLayoutMode === 'row') {
-                    candidateCols = [N]; // All visible streams in 1 horizontal row
+                    candidateCols = [N];
                 } else if (currentLayoutMode === 'grid') {
-                    candidateCols = [Math.min(2, N)]; // 2-column grid when N >= 2
+                    candidateCols = [Math.min(2, N)];
                 } else {
-                    // 'auto' mode: test column counts 1..N to find largest stream size that fits
                     for (let c = 1; c <= N; c++) candidateCols.push(c);
                 }
 
@@ -630,7 +1064,6 @@
 
                     const cellW = (availW - totalGapX) / cols;
                     const cellH = (availH - totalGapY) / rows;
-
                     if (cellW <= 0 || cellH <= 0) continue;
 
                     let w = cellW;
@@ -644,7 +1077,6 @@
                     const totalH = h * rows + totalGapY;
                     const fits = (totalW <= availW + 1) && (totalH <= availH + 1);
 
-                    // Check if streams fit on screen AND meet the minimum size limit
                     if (fits && w >= MIN_STREAM_WIDTH) {
                         const area = w * h;
                         if (area > maxArea) {
@@ -654,8 +1086,6 @@
                     }
                 }
 
-                // If viewport is too small to fit streams at >= MIN_STREAM_WIDTH:
-                // Engage scroll mode with streams preserved at their minimum size limit
                 if (!bestFit) {
                     let cols = Math.floor((availW + GAP) / (MIN_STREAM_WIDTH + GAP));
                     cols = Math.max(1, Math.min(cols, N));
@@ -666,11 +1096,9 @@
 
                     let w = (availW - (cols - 1) * GAP) / cols;
                     if (w < MIN_STREAM_WIDTH) {
-                        // Narrow screen / mobile view: adapt width to viewport
                         w = Math.max(260, availW);
                         cols = 1;
                     } else {
-                        // Keep stream size bounded near the minimum threshold
                         w = Math.max(MIN_STREAM_WIDTH, Math.min(w, MIN_STREAM_WIDTH * 1.35));
                     }
 
@@ -693,16 +1121,31 @@
                 }
             }
 
+            // Stream visibility & smart resource unloading
             function setCameraVisibility(camId, isVisible, shouldSave = true) {
                 state[camId] = isVisible;
                 const camEl = document.getElementById(camId);
                 const toggleBtn = document.querySelector(`.toggle-btn[data-target="${camId}"]`);
 
                 if (camEl) {
+                    const iframe = camEl.querySelector('iframe');
                     if (isVisible) {
                         camEl.classList.remove('is-hidden');
+                        if (iframe) {
+                            const dataSrc = iframe.getAttribute('data-src');
+                            if (dataSrc && (!iframe.src || iframe.src === 'about:blank')) {
+                                iframe.src = dataSrc;
+                            }
+                        }
                     } else {
                         camEl.classList.add('is-hidden');
+                        // Unload stream to save bandwidth and CPU when hidden
+                        if (iframe) {
+                            iframe.src = 'about:blank';
+                        }
+                        if (maximizedCamId === camId) {
+                            toggleMaximizeCamera(camId);
+                        }
                     }
                 }
 
@@ -719,8 +1162,101 @@
                 }
             }
 
+            // Stream Reload Functionality
+            function reloadCamera(camId) {
+                const holder = document.getElementById(camId);
+                if (!holder) return;
+                const iframe = holder.querySelector('iframe');
+                if (!iframe) return;
+
+                const reloadBtn = holder.querySelector('.reload-btn');
+                if (reloadBtn) reloadBtn.classList.add('is-reloading');
+
+                const targetSrc = iframe.getAttribute('data-src') || iframe.src;
+                iframe.src = 'about:blank';
+                setTimeout(() => {
+                    iframe.src = targetSrc;
+                    setTimeout(() => {
+                        if (reloadBtn) reloadBtn.classList.remove('is-reloading');
+                    }, 500);
+                }, 120);
+            }
+
+            function reloadAllActiveCameras() {
+                const reloadAllBtn = document.getElementById('btn-reload-all');
+                if (reloadAllBtn) reloadAllBtn.classList.add('active');
+
+                cameraIds.forEach(id => {
+                    if (state[id] !== false) {
+                        reloadCamera(id);
+                    }
+                });
+
+                setTimeout(() => {
+                    if (reloadAllBtn) reloadAllBtn.classList.remove('active');
+                }, 600);
+            }
+
+            // Maximize / Single Camera Focus Mode
+            function toggleMaximizeCamera(camId) {
+                const holder = document.getElementById(camId);
+                if (!holder) return;
+
+                if (maximizedCamId === camId) {
+                    // Restore to multi-camera view
+                    maximizedCamId = null;
+                    holder.classList.remove('is-maximized');
+                    if (maximizeBanner) maximizeBanner.classList.remove('visible');
+                    document.querySelectorAll('.maximize-btn').forEach(btn => btn.classList.remove('active'));
+                } else {
+                    // Focus on this camera
+                    if (maximizedCamId) {
+                        const prev = document.getElementById(maximizedCamId);
+                        if (prev) prev.classList.remove('is-maximized');
+                    }
+                    maximizedCamId = camId;
+                    holder.classList.add('is-maximized');
+                    if (maximizeBanner) maximizeBanner.classList.add('visible');
+
+                    document.querySelectorAll('.maximize-btn').forEach(btn => {
+                        btn.classList.toggle('active', btn.getAttribute('data-target') === camId);
+                    });
+                }
+                scheduleLayoutUpdate();
+            }
+
+            // Fullscreen API Handling
+            const fullscreenBtn = document.getElementById('btn-fullscreen');
+            const fullscreenBtnText = document.getElementById('fullscreen-btn-text');
+
+            function toggleFullscreen() {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().catch(err => {
+                        console.warn('Error enabling fullscreen mode:', err);
+                    });
+                } else {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    }
+                }
+            }
+
+            document.addEventListener('fullscreenchange', () => {
+                const isFs = !!document.fullscreenElement;
+                if (fullscreenBtn) fullscreenBtn.classList.toggle('active', isFs);
+                if (fullscreenBtnText) fullscreenBtnText.textContent = isFs ? 'Exit' : 'Fullscreen';
+            });
+
+            if (fullscreenBtn) {
+                fullscreenBtn.addEventListener('click', toggleFullscreen);
+            }
+
+            // Layout Mode Switcher
             function setLayoutMode(mode) {
                 currentLayoutMode = mode;
+                if (maximizedCamId) {
+                    toggleMaximizeCamera(maximizedCamId);
+                }
                 document.querySelectorAll('.layout-btn').forEach(btn => {
                     const isActive = btn.getAttribute('data-layout') === mode;
                     btn.classList.toggle('active', isActive);
@@ -730,14 +1266,13 @@
                 scheduleLayoutUpdate();
             }
 
-            // Bind layout mode buttons
             document.querySelectorAll('.layout-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     setLayoutMode(btn.getAttribute('data-layout'));
                 });
             });
 
-            // Bind toolbar toggle buttons
+            // Bind toolbar camera toggle buttons
             document.querySelectorAll('.toggle-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const targetId = btn.getAttribute('data-target');
@@ -746,41 +1281,113 @@
                 });
             });
 
-            // Bind card "Hide" buttons
-            document.querySelectorAll('.card-hide-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const targetId = btn.getAttribute('data-target');
-                    setCameraVisibility(targetId, false);
-                });
+            // Bind card header buttons & double-click
+            document.querySelectorAll('.holder').forEach(holder => {
+                const camId = holder.id;
+                const header = holder.querySelector('.card-header');
+
+                // Double click header to maximize / restore
+                if (header) {
+                    header.addEventListener('dblclick', (e) => {
+                        if (e.target.closest('button')) return;
+                        toggleMaximizeCamera(camId);
+                    });
+                }
+
+                // Reload button
+                const reloadBtn = holder.querySelector('.reload-btn');
+                if (reloadBtn) {
+                    reloadBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        reloadCamera(camId);
+                    });
+                }
+
+                // Maximize button
+                const maxBtn = holder.querySelector('.maximize-btn');
+                if (maxBtn) {
+                    maxBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        toggleMaximizeCamera(camId);
+                    });
+                }
+
+                // Hide button
+                const hideBtn = holder.querySelector('.hide-btn');
+                if (hideBtn) {
+                    hideBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        setCameraVisibility(camId, false);
+                    });
+                }
             });
 
-            // "Show All" actions
+            // Show All / Reload All buttons
             function showAllCameras() {
                 cameraIds.forEach(id => setCameraVisibility(id, true, false));
                 savePreferences(state);
             }
 
-            // "Hide All" actions
-            function hideAllCameras() {
-                cameraIds.forEach(id => setCameraVisibility(id, false, false));
-                savePreferences(state);
-            }
-
             const showAllBtn = document.getElementById('btn-show-all');
-            if (showAllBtn) {
-                showAllBtn.addEventListener('click', showAllCameras);
-            }
-
-            const hideAllBtn = document.getElementById('btn-hide-all');
-            if (hideAllBtn) {
-                hideAllBtn.addEventListener('click', hideAllCameras);
-            }
+            if (showAllBtn) showAllBtn.addEventListener('click', showAllCameras);
 
             const emptyShowAllBtn = document.getElementById('empty-show-all-btn');
-            if (emptyShowAllBtn) {
-                emptyShowAllBtn.addEventListener('click', showAllCameras);
+            if (emptyShowAllBtn) emptyShowAllBtn.addEventListener('click', showAllCameras);
+
+            const reloadAllBtn = document.getElementById('btn-reload-all');
+            if (reloadAllBtn) reloadAllBtn.addEventListener('click', reloadAllActiveCameras);
+
+            const restoreViewBtn = document.getElementById('btn-restore-view');
+            if (restoreViewBtn) {
+                restoreViewBtn.addEventListener('click', () => {
+                    if (maximizedCamId) toggleMaximizeCamera(maximizedCamId);
+                });
             }
+
+            // Shortcuts Modal
+            function toggleShortcutsModal(open) {
+                if (!shortcutsModal) return;
+                const isOpen = open !== undefined ? open : !shortcutsModal.classList.contains('open');
+                shortcutsModal.classList.toggle('open', isOpen);
+                shortcutsModal.setAttribute('aria-hidden', (!isOpen).toString());
+            }
+
+            const shortcutsBtn = document.getElementById('btn-shortcuts');
+            if (shortcutsBtn) shortcutsBtn.addEventListener('click', () => toggleShortcutsModal());
+
+            const modalCloseBtn = document.getElementById('modal-close-btn');
+            if (modalCloseBtn) modalCloseBtn.addEventListener('click', () => toggleShortcutsModal(false));
+
+            if (shortcutsModal) {
+                shortcutsModal.addEventListener('click', (e) => {
+                    if (e.target === shortcutsModal) toggleShortcutsModal(false);
+                });
+            }
+
+            // Keyboard Shortcuts
+            window.addEventListener('keydown', (e) => {
+                if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) return;
+
+                if (e.key === '1') {
+                    setCameraVisibility('cam-firstst', state['cam-firstst'] === false);
+                } else if (e.key === '2') {
+                    setCameraVisibility('cam-prospertrl', state['cam-prospertrl'] === false);
+                } else if (e.key === '3') {
+                    setCameraVisibility('cam-frontierpk', state['cam-frontierpk'] === false);
+                } else if (e.key.toLowerCase() === 'f') {
+                    toggleFullscreen();
+                } else if (e.key.toLowerCase() === 'r') {
+                    reloadAllActiveCameras();
+                } else if (e.key === 'Escape') {
+                    if (shortcutsModal && shortcutsModal.classList.contains('open')) {
+                        toggleShortcutsModal(false);
+                    } else if (maximizedCamId) {
+                        toggleMaximizeCamera(maximizedCamId);
+                    }
+                } else if (e.key === '?') {
+                    toggleShortcutsModal();
+                }
+            });
 
             // Initialize UI state
             cameraIds.forEach(id => {
