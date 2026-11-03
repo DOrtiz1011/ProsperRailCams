@@ -212,6 +212,13 @@
             box-shadow: 0 0 12px rgba(59, 130, 246, 0.2);
         }
 
+        #btn-eco-mode.active {
+            background: rgba(34, 197, 94, 0.15);
+            color: #4ade80;
+            border-color: rgba(34, 197, 94, 0.4);
+            box-shadow: 0 0 12px rgba(34, 197, 94, 0.2);
+        }
+
         .toggle-btn .icon,
         .action-btn .icon {
             width: 14px;
@@ -516,6 +523,45 @@
             border-color: var(--accent-color);
         }
 
+        /* Toast Notification */
+        .toast-notice {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: rgba(15, 23, 42, 0.94);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: #f8fafc;
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 0.95rem;
+            border-radius: 9999px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+            z-index: 150;
+            opacity: 0;
+            transform: translateY(12px);
+            pointer-events: none;
+            transition: opacity 0.22s ease, transform 0.22s ease;
+        }
+
+        .toast-notice.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast-notice::before {
+            content: '';
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background-color: var(--accent-color);
+            display: inline-block;
+        }
+
         /* Shortcuts Help Modal */
         .modal-backdrop {
             position: fixed;
@@ -650,6 +696,15 @@
                 min-width: 100%;
             }
         }
+
+        @media (max-width: 600px) {
+            .toast-notice {
+                bottom: 16px;
+                right: 16px;
+                left: 16px;
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 
@@ -753,7 +808,17 @@
 
             <div class="divider"></div>
 
-            <!-- Fullscreen & Shortcuts Help Buttons -->
+            <!-- Eco Mode, Fullscreen & Shortcuts Help Buttons -->
+            <button type="button" class="toggle-btn" id="btn-eco-mode" aria-pressed="false"
+                title="Eco Mode: Pause streams in background to save data & battery (Key: E)">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path>
+                    <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path>
+                </svg>
+                <span>Eco Mode</span>
+            </button>
+
             <button type="button" class="action-btn" id="btn-fullscreen" title="Toggle Fullscreen (Key: F)">
                 <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round">
@@ -815,9 +880,10 @@
                 </div>
             </div>
             <iframe class="responsive-iframe"
-                data-src="https://g1.ipcamlive.com/player/player.php?alias=firstst&amp;autoplay=1&amp;"
-                src="https://g1.ipcamlive.com/player/player.php?alias=firstst&amp;autoplay=1&amp;"
-                allowfullscreen="allowfullscreen" title="First Street - West Bound Railcam">
+                data-src="https://g1.ipcamlive.com/player/player.php?alias=firstst&amp;autoplay=1"
+                src="https://g1.ipcamlive.com/player/player.php?alias=firstst&amp;autoplay=1"
+                allow="fullscreen; autoplay; picture-in-picture" allowfullscreen
+                referrerpolicy="no-referrer-when-downgrade" title="First Street - West Bound Railcam">
             </iframe>
         </article>
 
@@ -858,9 +924,10 @@
                 </div>
             </div>
             <iframe class="responsive-iframe"
-                data-src="https://g1.ipcamlive.com/player/player.php?alias=prospertrl&amp;autoplay=1&amp;"
-                src="https://g1.ipcamlive.com/player/player.php?alias=prospertrl&amp;autoplay=1&amp;"
-                allowfullscreen="allowfullscreen" title="Prosper Trail - West Bound Railcam">
+                data-src="https://g1.ipcamlive.com/player/player.php?alias=prospertrl&amp;autoplay=1"
+                src="https://g1.ipcamlive.com/player/player.php?alias=prospertrl&amp;autoplay=1"
+                allow="fullscreen; autoplay; picture-in-picture" allowfullscreen
+                referrerpolicy="no-referrer-when-downgrade" title="Prosper Trail - West Bound Railcam">
             </iframe>
         </article>
 
@@ -901,9 +968,10 @@
                 </div>
             </div>
             <iframe class="responsive-iframe"
-                data-src="https://g1.ipcamlive.com/player/player.php?alias=frontierpk&amp;autoplay=1&amp;"
-                src="https://g1.ipcamlive.com/player/player.php?alias=frontierpk&amp;autoplay=1&amp;"
-                allowfullscreen="allowfullscreen" title="Frontier Park - East Bound Railcam">
+                data-src="https://g1.ipcamlive.com/player/player.php?alias=frontierpk&amp;autoplay=1"
+                src="https://g1.ipcamlive.com/player/player.php?alias=frontierpk&amp;autoplay=1"
+                allow="fullscreen; autoplay; picture-in-picture" allowfullscreen
+                referrerpolicy="no-referrer-when-downgrade" title="Frontier Park - East Bound Railcam">
             </iframe>
         </article>
 
@@ -928,6 +996,9 @@
         <button type="button" id="btn-restore-view" title="Restore multi-camera grid (Key: Esc)">Restore
             Multi-View</button>
     </div>
+
+    <!-- Toast Notification for Stream Reconnect / Status -->
+    <div class="toast-notice" id="toast-notice" role="status" aria-live="polite"></div>
 
     <!-- Shortcuts Help Modal -->
     <div class="modal-backdrop" id="shortcuts-modal" aria-hidden="true">
@@ -959,6 +1030,10 @@
                     <div class="shortcut-keys"><kbd>R</kbd></div>
                 </div>
                 <div class="shortcut-row">
+                    <span>Toggle Eco / Background Pause Mode</span>
+                    <div class="shortcut-keys"><kbd>E</kbd></div>
+                </div>
+                <div class="shortcut-row">
                     <span>Restore Multi-View / Close Modal</span>
                     <div class="shortcut-keys"><kbd>Esc</kbd></div>
                 </div>
@@ -974,11 +1049,15 @@
         (function () {
             const STORAGE_KEY = 'prosper_railcam_visibility';
             const LAYOUT_STORAGE_KEY = 'prosper_railcam_layout_mode';
+            const ECO_STORAGE_KEY = 'prosper_railcam_eco_mode';
+            const STALE_STREAM_THRESHOLD_MS = 45000; // 45 seconds backgrounded triggers fresh sync
             const cameraIds = ['cam-firstst', 'cam-prospertrl', 'cam-frontierpk'];
             const emptyState = document.getElementById('empty-state');
             const container = document.getElementById('stream-container');
             const maximizeBanner = document.getElementById('maximize-banner');
             const shortcutsModal = document.getElementById('shortcuts-modal');
+            const toastNotice = document.getElementById('toast-notice');
+            const ecoBtn = document.getElementById('btn-eco-mode');
 
             // Sizing engine constants
             const MIN_STREAM_WIDTH = 360;
@@ -1028,6 +1107,51 @@
                     localStorage.setItem(LAYOUT_STORAGE_KEY, mode);
                 } catch (e) {
                     console.warn('localStorage write error:', e);
+                }
+            }
+
+            function loadEcoPreference() {
+                try {
+                    const saved = localStorage.getItem(ECO_STORAGE_KEY);
+                    return saved === 'true';
+                } catch (e) {
+                    console.warn('localStorage read error:', e);
+                    return false;
+                }
+            }
+
+            function saveEcoPreference(enabled) {
+                try {
+                    localStorage.setItem(ECO_STORAGE_KEY, enabled ? 'true' : 'false');
+                } catch (e) {
+                    console.warn('localStorage write error:', e);
+                }
+            }
+
+            let ecoModeEnabled = loadEcoPreference();
+
+            // Lightweight toast feedback for stream sync/recovery events
+            let toastTimeout = null;
+            function showToast(message, duration = 2400) {
+                if (!toastNotice) return;
+                toastNotice.textContent = message;
+                toastNotice.classList.add('visible');
+                if (toastTimeout) clearTimeout(toastTimeout);
+                toastTimeout = setTimeout(() => {
+                    toastNotice.classList.remove('visible');
+                }, duration);
+            }
+
+            // Fresh timestamp URL helper to prevent browser/proxy caching of stale WebRTC/HLS streams
+            function getFreshStreamUrl(baseSrc) {
+                if (!baseSrc || baseSrc === 'about:blank') return '';
+                try {
+                    const url = new URL(baseSrc, window.location.href);
+                    url.searchParams.set('_t', Date.now().toString());
+                    return url.toString();
+                } catch (e) {
+                    const sep = baseSrc.includes('?') ? '&' : '?';
+                    return `${baseSrc}${sep}_t=${Date.now()}`;
                 }
             }
 
@@ -1214,7 +1338,7 @@
                         if (iframe) {
                             const dataSrc = iframe.getAttribute('data-src');
                             if (dataSrc && (!iframe.src || iframe.src === 'about:blank')) {
-                                iframe.src = dataSrc;
+                                iframe.src = getFreshStreamUrl(dataSrc);
                             }
                         }
                     } else {
@@ -1242,39 +1366,41 @@
                 }
             }
 
-            // Stream Reload Functionality
-            function reloadCamera(camId) {
+            // Stream Reload Functionality with fresh cache-busting timestamp
+            function reloadCamera(camId, silent = false) {
                 const holder = document.getElementById(camId);
                 if (!holder) return;
                 const iframe = holder.querySelector('iframe');
                 if (!iframe) return;
 
                 const reloadBtn = holder.querySelector('.reload-btn');
-                if (reloadBtn) reloadBtn.classList.add('is-reloading');
+                if (reloadBtn && !silent) reloadBtn.classList.add('is-reloading');
 
-                const targetSrc = iframe.getAttribute('data-src') || iframe.src;
+                const baseSrc = iframe.getAttribute('data-src') || iframe.src;
                 iframe.src = 'about:blank';
                 setTimeout(() => {
-                    iframe.src = targetSrc;
+                    iframe.src = getFreshStreamUrl(baseSrc);
                     setTimeout(() => {
-                        if (reloadBtn) reloadBtn.classList.remove('is-reloading');
+                        if (reloadBtn && !silent) reloadBtn.classList.remove('is-reloading');
                     }, 500);
                 }, 120);
             }
 
-            function reloadAllActiveCameras() {
+            function reloadAllActiveCameras(silent = false) {
                 const reloadAllBtn = document.getElementById('btn-reload-all');
-                if (reloadAllBtn) reloadAllBtn.classList.add('active');
+                if (reloadAllBtn && !silent) reloadAllBtn.classList.add('active');
 
                 cameraIds.forEach(id => {
                     if (state[id] !== false) {
-                        reloadCamera(id);
+                        reloadCamera(id, silent);
                     }
                 });
 
-                setTimeout(() => {
-                    if (reloadAllBtn) reloadAllBtn.classList.remove('active');
-                }, 600);
+                if (!silent) {
+                    setTimeout(() => {
+                        if (reloadAllBtn) reloadAllBtn.classList.remove('active');
+                    }, 600);
+                }
             }
 
             // Maximize / Single Camera Focus Mode
@@ -1444,6 +1570,89 @@
                 });
             }
 
+            // Eco Mode Management
+            function setEcoMode(enabled) {
+                ecoModeEnabled = enabled;
+                saveEcoPreference(enabled);
+                if (ecoBtn) {
+                    ecoBtn.classList.toggle('active', enabled);
+                    ecoBtn.setAttribute('aria-pressed', enabled ? 'true' : 'false');
+                }
+                showToast(enabled ? 'Eco Mode: ON (streams pause in background)' : 'Eco Mode: OFF');
+            }
+
+            if (ecoBtn) {
+                ecoBtn.classList.toggle('active', ecoModeEnabled);
+                ecoBtn.setAttribute('aria-pressed', ecoModeEnabled ? 'true' : 'false');
+                ecoBtn.addEventListener('click', () => {
+                    setEcoMode(!ecoModeEnabled);
+                });
+            }
+
+            // Page Visibility API & Auto-Recovery for Stale Streams
+            let lastHiddenTimestamp = 0;
+            let isPausedForEco = false;
+
+            function pauseStreamsForBackground() {
+                cameraIds.forEach(id => {
+                    if (state[id] !== false) {
+                        const holder = document.getElementById(id);
+                        if (holder) {
+                            const iframe = holder.querySelector('iframe');
+                            if (iframe) iframe.src = 'about:blank';
+                        }
+                    }
+                });
+                isPausedForEco = true;
+            }
+
+            function resumeStreamsFromBackground() {
+                cameraIds.forEach(id => {
+                    if (state[id] !== false) {
+                        const holder = document.getElementById(id);
+                        if (holder) {
+                            const iframe = holder.querySelector('iframe');
+                            if (iframe) {
+                                const dataSrc = iframe.getAttribute('data-src');
+                                if (dataSrc) iframe.src = getFreshStreamUrl(dataSrc);
+                            }
+                        }
+                    }
+                });
+                isPausedForEco = false;
+            }
+
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'hidden') {
+                    lastHiddenTimestamp = Date.now();
+                    if (ecoModeEnabled) {
+                        pauseStreamsForBackground();
+                    }
+                } else if (document.visibilityState === 'visible') {
+                    const awayDuration = lastHiddenTimestamp > 0 ? (Date.now() - lastHiddenTimestamp) : 0;
+                    if (isPausedForEco) {
+                        resumeStreamsFromBackground();
+                        showToast('Resumed live streams');
+                    } else if (lastHiddenTimestamp > 0 && awayDuration > STALE_STREAM_THRESHOLD_MS) {
+                        // Backgrounded tabs cause browser to throttle timers & WebRTC/HLS decoders.
+                        // Quietly reconnect all active streams with fresh timestamp to prevent frozen streams.
+                        reloadAllActiveCameras(true);
+                        showToast('Live streams refreshed');
+                    }
+                    lastHiddenTimestamp = 0;
+                }
+            });
+
+            // Network Online/Offline Auto-Recovery
+            window.addEventListener('online', () => {
+                showToast('Network restored — reconnecting streams...');
+                reloadAllActiveCameras();
+            });
+
+            window.addEventListener('offline', () => {
+                showToast('Network offline');
+            });
+
             // Keyboard Shortcuts
             window.addEventListener('keydown', (e) => {
                 if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) return;
@@ -1458,6 +1667,8 @@
                     toggleFullscreen();
                 } else if (e.key.toLowerCase() === 'r') {
                     reloadAllActiveCameras();
+                } else if (e.key.toLowerCase() === 'e') {
+                    setEcoMode(!ecoModeEnabled);
                 } else if (e.key === 'Escape') {
                     if (shortcutsModal && shortcutsModal.classList.contains('open')) {
                         toggleShortcutsModal(false);
